@@ -1,0 +1,48 @@
+--Question 1:--
+
+--Database creation file and table creations scripts, 
+--using PK's not auto incrimented as they exist in the flat files--
+--PK field set to VarChar to match the flat file data, as the existing ID's contain letters--
+
+CREATE TABLE VOLUNTEER (
+    VOL_ID VARCHAR(10) PRIMARY KEY,
+    VOL_FNAME VARCHAR(100) NOT NULL,
+    VOL_SNAME VARCHAR(100) NOT NULL,
+    CONTACT VARCHAR(15) NOT NULL,
+    ADDRESS VARCHAR(255) NOT NULL,
+    EMAIL VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE DONAR (
+    DONAR_ID VARCHAR(10) PRIMARY KEY,
+    DONAR_FNAME VARCHAR(100) NOT NULL,
+    DONAR_LNAME VARCHAR(100) NOT NULL,
+    CONTACT_NO VARCHAR(15) NOT NULL,
+    EMAIL VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE BIKE (
+    BIKE_ID VARCHAR(10) PRIMARY KEY,
+    DESCRIPTION VARCHAR(255) NOT NULL,
+    BIKE_TYPE VARCHAR(50) NOT NULL,
+    MANUFACTURER VARCHAR(50) NOT NULL
+);
+
+--Foreign keys to link the tables together--
+--the "Value" field was renamed to "BIKE_Value" as it will not execute and to avoid using reserved words--
+CREATE TABLE DONATION (
+    DONATION_ID VARCHAR(10) PRIMARY KEY,
+    DONAR_ID VARCHAR(10),
+    BIKE_ID VARCHAR(10),
+    BIKE_Value DECIMAL(10,2) NOT NULL,
+    VOLUNTEER_ID VARCHAR(10),
+    DONATION_DATE DATE NOT NULL,
+    CONSTRAINT fk_donar FOREIGN KEY (DONAR_ID) REFERENCES DONAR(DONAR_ID),
+    CONSTRAINT fk_bike FOREIGN KEY (BIKE_ID) REFERENCES BIKE(BIKE_ID),
+    CONSTRAINT fk_volunteer FOREIGN KEY (VOLUNTEER_ID) REFERENCES VOLUNTEER(VOL_ID)
+);
+
+
+--NOTE: The data will be inserted using the import wizard within SQL Developer--
+
+------------------------------------------------------EOF-------------------------------------------------
