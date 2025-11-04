@@ -1,0 +1,61 @@
+--Question 3--
+
+--ensure results are displayed--
+SET SERVEROUTPUT ON;
+
+DECLARE
+--declare a constant variable to store the 15% VAT which will be used for calculations--
+    v_vat_rate CONSTANT NUMBER := 0.15;  
+    --create a cursor that selects specific fields from the bike and donation tables--
+    CURSOR road_bike_cursor IS
+        SELECT 
+            b.DESCRIPTION,
+            b.MANUFACTURER,
+            b.BIKE_TYPE,
+            dn.BIKE_Value
+        FROM 
+            BIKE b
+        --join the bike and donation tables using BIKE_ID as the joining field--
+        JOIN 
+            DONATION dn ON b.BIKE_ID = dn.BIKE_ID
+        --filter the results to only show road bikes--
+        WHERE 
+            b.BIKE_TYPE = 'Road Bike';
+
+    
+    --declare variables that will store the values retrieved from the cursor, using %TYPE to match the table column data types--
+    v_description BIKE.DESCRIPTION%TYPE;
+    v_manufacturer BIKE.MANUFACTURER%TYPE;
+    v_bike_type BIKE.BIKE_TYPE%TYPE;
+    v_bike_value DONATION.BIKE_Value%TYPE;
+    --declare variables for storing the calculated VAT amount and total amount--
+    v_vat_amount NUMBER;
+    v_total_amount NUMBER;
+BEGIN
+    --loops through each record in the cursor to process road bikes one at a time--
+    FOR rec IN road_bike_cursor LOOP
+        
+        --assign the values from the cursor to local variables for processing--
+        v_description := rec.DESCRIPTION;
+        v_manufacturer := rec.MANUFACTURER;
+        v_bike_type := rec.BIKE_TYPE;
+        v_bike_value := rec.BIKE_Value;
+
+        --calculate VAT by multiplying the bike value with the VAT rate--
+        v_vat_amount := v_bike_value * v_vat_rate;
+        --calculate total by adding the bike value and VAT amount--
+        v_total_amount := v_bike_value + v_vat_amount;
+
+        --displays all the bike information and calculations in a formatted output, using "||" to concatenate--
+        DBMS_OUTPUT.PUT_LINE('Description: ' || v_description);
+        DBMS_OUTPUT.PUT_LINE('Manufacturer: ' || v_manufacturer);
+        DBMS_OUTPUT.PUT_LINE('Bike Type: ' || v_bike_type);
+        DBMS_OUTPUT.PUT_LINE('Value: R ' || TO_CHAR(v_bike_value, '9999.99'));
+        DBMS_OUTPUT.PUT_LINE('VAT (15%): R ' || TO_CHAR(v_vat_amount, '9999.99'));
+        DBMS_OUTPUT.PUT_LINE('Total Amount: R ' || TO_CHAR(v_total_amount, '9999.99'));
+        DBMS_OUTPUT.PUT_LINE('----------------------------------------');
+    END LOOP;
+END;
+
+--------------------------------------------------EOF--------------------------------------------------
+
