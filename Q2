@@ -1,0 +1,21 @@
+--Question 2--
+
+
+--chooses the DONAR_ID, BIKE_TYPE, DESCRIPTION and BIKE_Value fields from the donation table
+SELECT 
+    d.DONAR_ID,
+    b.BIKE_TYPE,
+    b.DESCRIPTION,
+    dn.BIKE_Value
+FROM 
+    DONATION dn
+    --joining the DONAR and BIKE tables to access their fields
+JOIN 
+    DONAR d ON dn.DONAR_ID = d.DONAR_ID
+JOIN 
+    BIKE b ON dn.BIKE_ID = b.BIKE_ID
+    --specifying the condition where the BIKE_Value is > than 1500
+WHERE 
+    dn.BIKE_Value > 1500;
+
+------------------------------------------------------EOF-------------------------------------------------
