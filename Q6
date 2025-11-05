@@ -1,0 +1,68 @@
+--Question 6--
+
+--creating a function that calculates the sum of all bike values donated by a specific donor using their ID--
+--this function accepts a donor ID as input and returns the total value of all their donations--
+--exception handling is included to handle cases where a donor has no donations or if the ID is invalid--
+
+-------------------------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION fnTotalDonationValueByDonor (
+    p_donor_id IN VARCHAR2
+) RETURN NUMBER
+IS
+    v_total_value NUMBER := 0;
+BEGIN
+    --calculates the total value by summing all bike values for the specified donor--
+    SELECT SUM(BIKE_Value)
+    INTO v_total_value
+    FROM DONATION
+    WHERE DONAR_ID = p_donor_id;
+
+    --returns the total value, using NVL to return 0 if the donor has no donations--
+    RETURN NVL(v_total_value, 0);
+
+EXCEPTION
+    --handles the case where no donations are found for the given donor ID--
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('No donations found for Donor ID: ' || p_donor_id);
+        RETURN 0;
+
+    --handles any unexpected errors that might occur during execution--
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+        RETURN 0;
+END;
+
+-------------------------------------------------------------------------------------------------------
+--ensure results are displayed--
+SET SERVEROUTPUT ON;
+
+DECLARE
+    --declare variables to store the donor ID and calculated total--
+    v_donor_id VARCHAR2(10) := 'DID11';
+    v_total NUMBER;
+BEGIN
+    --call the function with the donor ID and store the returned value--
+    v_total := fnTotalDonationValueByDonor(v_donor_id);
+
+    --display the total donation value for the specified donor in a formatted output--
+    DBMS_OUTPUT.PUT_LINE('Total donation value for Donor ' || v_donor_id || ': R ' || TO_CHAR(v_total, '9999.99'));
+END;
+
+-------------------------------------------------------------------------------------------------------
+--justification for the function:
+--the function was designed to calculate the total value of donations made by a specific donor, making it easier
+--for staff to track and analyze donor contributions. the function uses exception handling to manage different
+--scenarios that might occur during execution--
+
+--the NO_DATA_FOUND exception prevents the function from failing when no donations are found, instead returning
+--0 and displaying a clear message. the WHEN OTHERS exception catches any unexpected errors and ensures the 
+--function handles them gracefully--
+
+--using a function for this purpose provides several benefits:
+--1. the function can be reused in different parts of the system like reports and procedures--
+--2. having the calculation logic in one place makes it easier to maintain and update--
+--3. the function executes efficiently as part of SQL queries or PL/SQL blocks--
+
+--this approach supports BikesRUs by providing a reliable way to track and analyze donor contributions--
+
+--------------------------------------------------EOF--------------------------------------------------
