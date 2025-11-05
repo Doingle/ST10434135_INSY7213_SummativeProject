@@ -1,0 +1,44 @@
+--Question 4--
+
+-------------------------------------------------------------------------------
+
+--Creating a view named vwBikeRUs to display donations made by volunteer with ID 'vol105'--
+CREATE OR REPLACE VIEW vwBikeRUs AS
+--selecting relevant fields from the DONAR, DONATION, and BIKE tables by joining them on their respective IDs--
+--concatenating the donor's first and last names using "||"--
+SELECT 
+    d.DONAR_FNAME || ' ' || d.DONAR_LNAME AS DONOR_NAME,
+    --selecting the contact number from the DONAR table--
+    d.CONTACT_NO AS DONOR_CONTACT,
+    b.BIKE_TYPE,
+    dn.DONATION_DATE
+FROM 
+    DONAR d
+JOIN 
+    DONATION dn ON d.DONAR_ID = dn.DONAR_ID
+JOIN 
+    BIKE b ON dn.BIKE_ID = b.BIKE_ID
+    --filtering the results to only include donations made by v"vol105"--
+WHERE 
+    dn.VOLUNTEER_ID = 'vol105';
+
+-------------------------------------------------------------------------------
+--Querying the vwBikeRUs view to display the results--
+SELECT * FROM vwBikeRUs;
+
+-------------------------------------------------------------------------------
+--Justification: 
+--The vwBikeRUs view consolidates information about bike donations made by only vol105. 
+--It combines data from the DONAR, DONATION, and BIKE table in order to provide a comprehensive overview of the 
+--donations made by the vol105 volunteer, including donor details, bike type, and donation date. This view simplifies 
+--the process of retrieving relevant information for reporting or analysis purposes, making it easy for a staff
+--member to quickly see donations associated with said volunteer, removing the need for them to write a 
+--complicated query.
+
+--The query was designed this way to ensure that only relevant data is presented, by first creating the view
+--then selecting the donar name, contact number, bike type, and donation date from the joined tables and con
+--catenating them as well as filtering the results to only include donations made by vol105. taking this approach
+--makes sure that the output is clear and focused on the specific requirements of the BikesRUs staff.
+
+--------------------------------------------------EOF--------------------------------------------------
+
