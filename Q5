@@ -1,0 +1,61 @@
+--Question 5--
+
+--this procedure retrieves and displays donor details based on a given Bike ID for a donation
+--BikeID is accepted as an input and displays the donor's full name, contact number, volunteer's first name
+--and donation date--
+
+--exception handling is included to manage cases where no data is found or other errors occur like a missing
+--Bike ID--
+
+-------------------------------------------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE spDonorDetails (
+    p_bike_id IN VARCHAR2
+)
+IS
+    --variable declerations and setting data types
+    v_donor_name     VARCHAR2(200);
+    v_contact_no     VARCHAR2(20);
+    v_vol_fname      VARCHAR2(100);
+    v_donation_date  DATE;
+
+-------------------------------------------------------------------------------------------------------
+BEGIN
+    --selection of donor and volunteer details based on the provided Bike ID
+    SELECT 
+        d.DONAR_FNAME || ' ' || d.DONAR_LNAME,
+        d.CONTACT_NO,
+        v.VOL_FNAME,
+        dn.DONATION_DATE
+    INTO 
+        v_donor_name,
+        v_contact_no,
+        v_vol_fname,
+        v_donation_date
+    FROM 
+        DONATION dn
+    JOIN 
+        DONAR d ON dn.DONAR_ID = d.DONAR_ID
+    JOIN 
+        VOLUNTEER v ON dn.VOLUNTEER_ID = v.VOL_ID
+    WHERE 
+        dn.BIKE_ID = p_bike_id;
+
+    --display the results in the output formatted nicely and concatenating the relevant strings
+    DBMS_OUTPUT.PUT_LINE('Donor Name      : ' || v_donor_name);
+    DBMS_OUTPUT.PUT_LINE('Contact Number  : ' || v_contact_no);
+    DBMS_OUTPUT.PUT_LINE('Volunteer Name  : ' || v_vol_fname);
+    DBMS_OUTPUT.PUT_LINE('Donation Date   : ' || TO_CHAR(v_donation_date, 'DD-MON-YYYY'));
+
+-------------------------------------------------------------------------------------------------------
+--exception handling blcok
+EXCEPTION
+    --handling of cases where no data is found for the specific Bike ID
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('No donation found for Bike ID: ' || p_bike_id);
+
+   --handling of cases where any other unexpected error occurs
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('An unexpected error occurred: ' || SQLERRM);
+END;
+
+--------------------------------------------------EOF--------------------------------------------------
