@@ -1,36 +1,56 @@
 --Question 7--
 
---selects specific fields from the bike and donation tables to display bike information--
-SELECT 
-    --bike ID's from bike table--
-    b.BIKE_ID,   
-    --bike tables type--              
-    b.BIKE_TYPE,          
-    --bikes tables manufacturer--    
-    b.MANUFACTURER,           
-    --donated bikes value from bike table--
-    dn.BIKE_Value,           
+--ensures that the output results will be displayed in the output console--
+SET SERVEROUTPUT ON;
 
-    --used a case statement to assign statuses to bikes with stars based on the value of bikes--
-    -- > R3000 assigns (***)  
-    -- > R1500 assigns (**)--
-    --else assigns (*)--
-    CASE 
-    --> R3000 applied first as if not, values >R3000 would also apply a (**) rating--
-        WHEN dn.BIKE_Value > 3000 THEN '(***)'      
-        WHEN dn.BIKE_Value > 1500 THEN '(**)'       
-        ELSE '(*)'                                   
-    END AS STATUS
+DECLARE
+    --creates a cursor that selects bike information from the bike and donation tables--
+    CURSOR cur_bikes IS
+        SELECT b.BIKE_ID, b.BIKE_TYPE, b.MANUFACTURER, dn.BIKE_Value
+        FROM BIKE b
+        --joins the bike and donation tables using the BIKE_ID as the joining field--
+        JOIN DONATION dn ON b.BIKE_ID = dn.BIKE_ID;
 
-FROM 
-    BIKE b
-    --join the bike and donation tables using the BIKE_ID as the joining field--
-JOIN 
-    DONATION dn ON b.BIKE_ID = dn.BIKE_ID;
+    --explanation for using %TYPE:
+    --using %TYPE ensures that our variables will automatically match the data types of their corresponding
+    --table columns, making the code more maintainable and resistant to database changes--
 
---CASE used in place of IF--
---why?:
---while an IF statement could be used in PL/SQL, a CASE statement was chosen because this is a SQL query and
---IF statements cannot be used directly in SQL SELECT statements, errors were being thrown. --
+    --declares variables that store the values retrieved from cursor--
+    v_bike_id       BIKE.BIKE_ID%TYPE;
+    v_bike_type     BIKE.BIKE_TYPE%TYPE;
+    v_manufacturer  BIKE.MANUFACTURER%TYPE;
+    v_bike_value    DONATION.BIKE_Value%TYPE;
+    v_status        VARCHAR2(10);
+BEGIN
+    --loops through each record in the cursor to process bikes one at a time--
+    FOR rec IN cur_bikes LOOP
+        --assigns the values from the cursor to local variables for processing--
+        v_bike_id := rec.BIKE_ID;
+        v_bike_type := rec.BIKE_TYPE;
+        v_manufacturer := rec.MANUFACTURER;
+        v_bike_value := rec.BIKE_Value;
+
+        --determines the status based on the bike value using an IF statement--
+        --assigns three stars for values over R3000--
+        --assigns two stars for values over R1500--
+        --assigns one star for all other values--
+        IF v_bike_value > 3000 THEN
+            v_status := '***';
+        ELSIF v_bike_value > 1500 THEN
+            v_status := '**';
+        ELSE
+            v_status := '*';
+        END IF;
+
+        --displays all the bike information and status in a formatted output using string concatenation--
+        DBMS_OUTPUT.PUT_LINE(
+            'Bike ID: ' || v_bike_id ||
+            ' | Type: ' || v_bike_type ||
+            ' | Manufacturer: ' || v_manufacturer ||
+            ' | Value: R ' || TO_CHAR(v_bike_value, '9999.99') ||
+            ' | Status: ' || v_status
+        );
+    END LOOP;
+END;
 
 --------------------------------------------------EOF--------------------------------------------------
