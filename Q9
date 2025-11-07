@@ -1,0 +1,48 @@
+--Question 9--
+
+-----------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
+--Q9.1--
+
+--this trigger prevents any deletion from the DONATION table
+--it fires first before a delete operation and raises an application error to block the action
+
+CREATE OR REPLACE TRIGGER trg_prevent_donation_delete
+BEFORE DELETE ON DONATION
+FOR EACH ROW
+BEGIN
+    RAISE_APPLICATION_ERROR(-20001, 'Deletion from the DONATION table is not allowed.');
+END;
+
+-----------------------------------------------------------------------------------------------
+--testing the trigger
+
+--this statement attempts to delete a donation record
+--it should fail and raise the error defined in the trigger
+
+DELETE FROM DONATION WHERE BIKE_ID = 'B001';
+
+-----------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
+--Q9.2--
+
+--this trigger ensures that any update to the BIKE_Value column in the DONATION table
+--must result in a value greater than 0. If not, it raises an application error
+
+CREATE OR REPLACE TRIGGER trg_validate_bike_value
+BEFORE UPDATE ON DONATION
+FOR EACH ROW
+BEGIN
+    IF :NEW.BIKE_Value <= 0 THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Invalid bike value: must be greater than 0.');
+    END IF;
+END;
+
+-----------------------------------------------------------------------------------------------
+--testing the trigger
+--this statement attempts to update a donation record with an invalid bike value
+--it should fail and raise the error defined in the trigger
+
+UPDATE DONATION SET BIKE_Value = -69420 WHERE BIKE_ID = 'B002';
+
+--------------------------------------------------EOF--------------------------------------------------
