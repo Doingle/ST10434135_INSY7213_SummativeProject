@@ -1,0 +1,36 @@
+--Question 7--
+
+--selects specific fields from the bike and donation tables to display bike information--
+SELECT 
+    --bike ID's from bike table--
+    b.BIKE_ID,   
+    --bike tables type--              
+    b.BIKE_TYPE,          
+    --bikes tables manufacturer--    
+    b.MANUFACTURER,           
+    --donated bikes value from bike table--
+    dn.BIKE_Value,           
+
+    --used a case statement to assign statuses to bikes with stars based on the value of bikes--
+    -- > R3000 assigns (***)  
+    -- > R1500 assigns (**)--
+    --else assigns (*)--
+    CASE 
+    --> R3000 applied first as if not, values >R3000 would also apply a (**) rating--
+        WHEN dn.BIKE_Value > 3000 THEN '(***)'      
+        WHEN dn.BIKE_Value > 1500 THEN '(**)'       
+        ELSE '(*)'                                   
+    END AS STATUS
+
+FROM 
+    BIKE b
+    --join the bike and donation tables using the BIKE_ID as the joining field--
+JOIN 
+    DONATION dn ON b.BIKE_ID = dn.BIKE_ID;
+
+--CASE used in place of IF--
+--why?:
+--while an IF statement could be used in PL/SQL, a CASE statement was chosen because this is a SQL query and
+--IF statements cannot be used directly in SQL SELECT statements, errors were being thrown. --
+
+--------------------------------------------------EOF--------------------------------------------------
